@@ -329,7 +329,7 @@
     function updateNetworkStatus() {
       const savedRole = getSavedRole().toLowerCase();
       // Verifikasi apakah peran saat ini diizinkan bekerja offline (Pengawas & Auditor)
-      const isOfflineCapable = savedRole.includes('pengawas') || savedRole.includes('auditor');
+      const isOfflineCapable = savedRole.includes('Pengawas') || savedRole.includes('Auditor');
 
       if (navigator.onLine) {
         offlineScreen.style.display = 'none';
