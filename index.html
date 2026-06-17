@@ -1,29 +1,328 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>AuditPro</title> 
 
+  <!-- Tautan Manifest PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#10b981">
+
+  <!-- Meta Tag Optimasi iOS (Safari PWA) -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="AuditPro">
+  <link rel="apple-touch-icon" href="icon.svg">
+
+  <!-- Link Google Fonts & FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+
   <style>
-    body {
+    * {
+      box-sizing: border-box;
+    }
+    body, html {
       margin: 0;
       padding: 0;
-      overflow: hidden; /* Biar ga ada scrollbar */
-      background-color: #0d1117; /* Warna background gelap biar pas loading ga silau */
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #0d1117;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
+
+    /* Iframe Penampung Google Apps Script */
     iframe {
       border: none;
       width: 100vw;
       height: 100vh;
       display: block;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+    }
+
+    /* Zettbos Premium Splash Screen Loader */
+    #splash-screen {
+      position: fixed;
+      inset: 0;
+      background-color: #090d16;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s;
+    }
+
+    .logo-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 120px;
+      height: 120px;
+      margin-bottom: 24px;
+    }
+
+    /* Efek Neon Glow Berdenyut */
+    .glow-ring {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 2px stroke rgba(16, 185, 129, 0.2);
+      box-shadow: 0 0 30px rgba(16, 185, 129, 0.15);
+      animation: pulseGlow 2s infinite ease-in-out;
+    }
+
+    .logo-icon {
+      font-size: 54px;
+      color: #10b981;
+      filter: drop-shadow(0 0 12px rgba(16, 185, 129, 0.5));
+      animation: logoFloat 3s infinite ease-in-out;
+      z-index: 2;
+    }
+
+    /* Teks Loading Premium */
+    .loading-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 1px;
+      margin: 0;
+      text-transform: uppercase;
+    }
+
+    .loading-subtitle {
+      font-size: 11px;
+      font-weight: 600;
+      color: #10b981;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-top: 6px;
+      opacity: 0.8;
+    }
+
+    .loading-bar-wrapper {
+      width: 180px;
+      height: 4px;
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      margin-top: 28px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .loading-bar-progress {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #34d399);
+      width: 30%;
+      border-radius: 10px;
+      position: absolute;
+      animation: shiftProgress 1.6s infinite ease-in-out;
+    }
+
+    #offline-screen {
+      position: fixed;
+      inset: 0;
+      background-color: #090d16;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9998;
+      padding: 24px;
+      text-align: center;
+      display: none; /* Hanya aktif saat koneksi offline */
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 40px 32px;
+      border-radius: 28px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .offline-icon-wrapper {
+      width: 80px;
+      height: 80px;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      color: #ef4444;
+      font-size: 32px;
+    }
+
+    .offline-title {
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 800;
+      margin: 0 0 8px 0;
+    }
+
+    .offline-desc {
+      color: #94a3b8;
+      font-size: 12px;
+      line-height: 1.6;
+      margin: 0 0 28px 0;
+    }
+
+    .retry-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #ffffff;
+      border: none;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      box-shadow: 0 10px 20px rgba(16, 185, 129, 0.25);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .retry-btn:active {
+      transform: scale(0.97);
+      box-shadow: 0 5px 10px rgba(16, 185, 129, 0.15);
+    }
+
+    /* Keyframe Animasi */
+    @keyframes pulseGlow {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.5;
+        box-shadow: 0 0 30px rgba(16, 185, 129, 0.15);
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.9;
+        box-shadow: 0 0 50px rgba(16, 185, 129, 0.35);
+      }
+    }
+
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    @keyframes shiftProgress {
+      0% { left: -30%; width: 30%; }
+      50% { left: 40%; width: 45%; }
+      100% { left: 100%; width: 30%; }
     }
   </style>
 </head>
 <body>
 
-  <iframe src="https://script.google.com/macros/s/AKfycbyLctKbGla0U2rUAhQ9LhtM_mP12UItS5qQyspteKhVkqED4K7Vm9f_oxRUJZthzARDdw/exec"></iframe>
+  <!-- Zettbos Premium Splash Screen -->
+  <div id="splash-screen">
+    <div class="logo-container">
+      <div class="glow-ring"></div>
+      <i class="fa-solid fa-leaf logo-icon"></i>
+    </div>
+    <h1 class="loading-title">AuditPro</h1>
+    <span class="loading-subtitle">Sistem Monitoring</span>
+    <div class="loading-bar-wrapper">
+      <div class="loading-bar-progress"></div>
+    </div>
+  </div>
+
+  <!-- Zettbos Premium Offline Screen -->
+  <div id="offline-screen">
+    <div class="glass-card">
+      <div class="offline-icon-wrapper">
+        <i class="fa-solid fa-wifi"></i>
+      </div>
+      <h2 class="offline-title">Koneksi Terputus</h2>
+      <p class="offline-desc">Aplikasi mendeteksi bahwa perangkat Anda sedang offline. Silakan periksa jaringan internet Anda dan coba lagi.</p>
+      <button class="retry-btn" onclick="checkNetworkAndReload()"> Coba Hubungkan Kembali </button>
+    </div>
+  </div>
+
+  <!-- Google Apps Script Embedded Iframe -->
+  <iframe id="app-iframe" src="https://script.google.com/macros/s/AKfycbyLctKbGla0U2rUAhQ9LhtM_mP12UItS5qQyspteKhVkqED4K7Vm9f_oxRUJZthzARDdw/exec"></iframe>
+
+  <script>
+    const iframe = document.getElementById('app-iframe');
+    const splashScreen = document.getElementById('splash-screen');
+    const offlineScreen = document.getElementById('offline-screen');
+
+    // 1. Pendeteksi Iframe Selesai Memuat (Sembunyikan Splash Screen)
+    iframe.onload = function() {
+      if (navigator.onLine) {
+        splashScreen.style.opacity = '0';
+        iframe.style.opacity = '1';
+        setTimeout(() => {
+          splashScreen.style.visibility = 'hidden';
+        }, 600);
+      }
+    };
+
+    // 2. Pendeteksi Keadaan Jaringan (Online / Offline)
+    function updateNetworkStatus() {
+      if (navigator.onLine) {
+        offlineScreen.style.display = 'none';
+        iframe.style.display = 'block';
+      } else {
+        splashScreen.style.visibility = 'hidden'; // Matikan loader jika offline terjadi di awal
+        offlineScreen.style.display = 'flex';
+        iframe.style.display = 'none';
+      }
+    }
+
+    // Event Listener Jaringan
+    window.addEventListener('online', updateNetworkStatus);
+    window.addEventListener('offline', updateNetworkStatus);
+
+    // Tombol Coba Lagi Manual
+    function checkNetworkAndReload() {
+      if (navigator.onLine) {
+        offlineScreen.style.display = 'none';
+        splashScreen.style.visibility = 'visible';
+        splashScreen.style.opacity = '1';
+        iframe.style.display = 'block';
+        iframe.src = iframe.src; // Muat ulang paksa iframe
+      } else {
+        // Efek getar kecil pada kartu offline jika ditekan saat masih offline
+        const card = document.querySelector('.glass-card');
+        card.style.transform = 'scale(0.98)';
+        setTimeout(() => { card.style.transform = 'scale(1)'; }, 100);
+      }
+    }
+
+    // Jalankan pengecekan status jaringan di awal
+    updateNetworkStatus();
+
+    // 3. Registrasi Service Worker PWA Secara Mulus
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((registration) => {
+            console.log('✓ Service Worker AuditPro berhasil terdaftar di domain Vercel dengan skope:', registration.scope);
+          })
+          .catch((error) => {
+            console.error('✗ Registrasi Service Worker gagal:', error);
+          });
+      });
+    }
+  </script>
 
 </body>
 </html>
