@@ -1,5 +1,3 @@
-<!-- STREAMING_CHUNK: Memulai pembaruan index_vercel.html... -->
-```html:Index Vercel:index_vercel.html
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -19,7 +17,7 @@
 
   <!-- Link Google Fonts & FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;800&display=swap" rel="stylesheet">
 
   <style>
     * {
@@ -80,9 +78,10 @@
       animation: pulseGlow 2s infinite ease-in-out;
     }
 
+    /* Ikon Vektor Premium Sawit Audit */
     .logo-icon {
-      font-size: 54px;
-      color: #10b981;
+      width: 90px;
+      height: 90px;
       filter: drop-shadow(0 0 12px rgba(16, 185, 129, 0.5));
       animation: logoFloat 3s infinite ease-in-out;
       z-index: 2;
@@ -206,10 +205,7 @@
       box-shadow: 0 5px 10px rgba(16, 185, 129, 0.15);
     }
 
-    /* ==========================================================================
-     ZETTBOT UPDATE: FLOATING ACTION BUTTON (RELOAD PWA)
-     Hanya diaktifkan secara visual bila aplikasi diinstal (standalone mode)
-     ========================================================================== */
+    /* Floating Action Button (Reload PWA) */
     #pwa-reload-btn {
       position: fixed;
       bottom: 24px;
@@ -221,7 +217,7 @@
       border: 1px solid rgba(52, 211, 153, 0.4);
       border-radius: 50%;
       box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
-      display: none; /* Disembunyikan pada peramban web reguler */
+      display: none; 
       align-items: center;
       justify-content: center;
       font-size: 20px;
@@ -237,14 +233,12 @@
       box-shadow: 0 5px 15px rgba(16, 185, 129, 0.2);
     }
 
-    /* Munculkan Tombol Reload Hanya Saat Diinstal (PWA Standalone) */
     @media (display-mode: standalone) {
       #pwa-reload-btn {
         display: flex !important;
       }
     }
 
-    /* Dukungan iOS WebApp Standalone */
     @media (display-mode: fullscreen) {
       #pwa-reload-btn {
         display: flex !important;
@@ -327,7 +321,22 @@
   <div id="splash-screen">
     <div class="logo-container">
       <div class="glow-ring"></div>
-      <i class="fa-solid fa-leaf logo-icon"></i>
+      <!-- ZETTBOT BRAND EMBLEM: Custom Palm & Audit Checklist Vector Logo (Inline SVG) -->
+      <svg viewBox="0 0 512 512" class="logo-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="256" cy="256" r="230" stroke="#ffffff" stroke-width="12" stroke-dasharray="16 12" opacity="0.25" />
+        <circle cx="256" cy="256" r="210" stroke="#ffffff" stroke-width="4" opacity="0.1" />
+        <path d="M 200,420 Q 256,330 256,120" stroke="#34d399" stroke-width="16" stroke-linecap="round" />
+        <path d="M 256,150 Q 140,160 110,210 Q 180,210 256,180" fill="#ffffff" opacity="0.9" />
+        <path d="M 256,210 Q 120,240 90,290 Q 170,280 256,240" fill="#ffffff" opacity="0.9" />
+        <path d="M 256,270 Q 110,320 80,370 Q 160,350 256,300" fill="#ffffff" opacity="0.9" />
+        <path d="M 256,150 Q 372,160 402,210 Q 332,210 256,180" fill="#ffffff" opacity="0.9" />
+        <path d="M 256,210 Q 392,240 422,290 Q 342,280 256,240" fill="#ffffff" opacity="0.9" />
+        <path d="M 256,270 Q 402,320 432,370 Q 352,350 256,300" fill="#ffffff" opacity="0.9" />
+        <g transform="translate(360, 140)">
+          <circle cx="0" cy="0" r="54" fill="#064e3b" stroke="#34d399" stroke-width="10" />
+          <path d="M -20,-4 L -6,12 L 20,-10" stroke="#34d399" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+        </g>
+      </svg>
     </div>
     <h1 class="loading-title">AuditPro</h1>
     <span class="loading-subtitle">Sistem Monitoring</span>
@@ -351,8 +360,8 @@
   <!-- Google Apps Script Embedded Iframe -->
   <iframe id="app-iframe" src="https://script.google.com/macros/s/AKfycbyLctKbGla0U2rUAhQ9LhtM_mP12UItS5qQyspteKhVkqED4K7Vm9f_oxRUJZthzARDdw/exec"></iframe>
 
-  <!-- ZETTBOT: Floating Action Reload Button (Terlihat Eksklusif di PWA Standalone Mode) -->
-  <button id="pwa-reload-btn" onclick="checkNetworkAndReload()" title="Reload Aplikasi ( GAS Force Sync )">
+  <!-- Floating Action Button (Reload PWA) -->
+  <button id="pwa-reload-btn" onclick="checkNetworkAndReload()" title="Reload Aplikasi">
     <i class="fa-solid fa-arrows-rotate"></i>
   </button>
 
@@ -401,7 +410,7 @@
           offlineScreen.style.display = 'none';
           iframe.style.display = 'block';
         } else {
-          // ADMIN, MASTER ATAU BELUM LOGIN (ANONYMOUS): Blokir layar penuh demi keamanan data
+          // ADMIN, MASTER ATAU BELUM LOGIN (ANONYMOUS): Layar diblokir penuh demi keamanan data
           offlineScreen.style.display = 'flex';
           iframe.style.display = 'none';
         }
@@ -427,7 +436,7 @@
       }
     });
 
-    // ZETTBOT UPDATE: Tombol Reload Cerdas (Mengatasi Caching Agresif Iframe)
+    // Tombol Reload Cerdas (Mengatasi Caching Agresif Iframe)
     function checkNetworkAndReload() {
       if (navigator.onLine) {
         offlineScreen.style.display = 'none';
