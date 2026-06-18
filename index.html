@@ -1,3 +1,5 @@
+<!-- STREAMING_CHUNK: Memulai pembaruan index_vercel.html... -->
+```html:Index Vercel:index_vercel.html
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -125,6 +127,7 @@
       animation: shiftProgress 1.6s infinite ease-in-out;
     }
 
+    /* Layar Offline Hard-Block */
     #offline-screen {
       position: fixed;
       inset: 0;
@@ -136,7 +139,7 @@
       z-index: 9998;
       padding: 24px;
       text-align: center;
-      display: none; /* Hanya aktif saat koneksi offline untuk peran yang dilarang */
+      display: none; 
     }
 
     .glass-card {
@@ -203,6 +206,95 @@
       box-shadow: 0 5px 10px rgba(16, 185, 129, 0.15);
     }
 
+    /* ==========================================================================
+     ZETTBOT UPDATE: FLOATING ACTION BUTTON (RELOAD PWA)
+     Hanya diaktifkan secara visual bila aplikasi diinstal (standalone mode)
+     ========================================================================== */
+    #pwa-reload-btn {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      width: 48px;
+      height: 48px;
+      background: rgba(16, 185, 129, 0.9);
+      color: white;
+      border: 1px solid rgba(52, 211, 153, 0.4);
+      border-radius: 50%;
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+      display: none; /* Disembunyikan pada peramban web reguler */
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 999;
+      transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #pwa-reload-btn:active {
+      transform: scale(0.9) rotate(45deg);
+      background: #059669;
+      box-shadow: 0 5px 15px rgba(16, 185, 129, 0.2);
+    }
+
+    /* Munculkan Tombol Reload Hanya Saat Diinstal (PWA Standalone) */
+    @media (display-mode: standalone) {
+      #pwa-reload-btn {
+        display: flex !important;
+      }
+    }
+
+    /* Dukungan iOS WebApp Standalone */
+    @media (display-mode: fullscreen) {
+      #pwa-reload-btn {
+        display: flex !important;
+      }
+    }
+
+    /* Toast Notification Pembaruan Versi PWA */
+    #pwa-update-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 14px 20px;
+      border-radius: 16px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      z-index: 1000;
+      opacity: 0;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s;
+    }
+
+    #pwa-update-toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .toast-text {
+      color: white;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+
+    .toast-btn {
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 800;
+      cursor: pointer;
+      text-transform: uppercase;
+      box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+    }
+
     /* Keyframe Animasi */
     @keyframes pulseGlow {
       0%, 100% {
@@ -244,12 +336,37 @@
     </div>
   </div>
 
+  <!-- Layar Offline Hard-Block (Hanya untuk Admin/Master) -->
+  <div id="offline-screen">
+    <div class="glass-card">
+      <div class="offline-icon-wrapper">
+        <i class="fa-solid fa-wifi"></i>
+      </div>
+      <h2 class="offline-title">Koneksi Terputus</h2>
+      <p class="offline-desc">Sesi administratif ditangguhkan. Silakan hubungkan kembali perangkat Anda ke internet untuk melanjutkan.</p>
+      <button class="retry-btn" onclick="checkNetworkAndReload()">Coba Lagi</button>
+    </div>
+  </div>
+
   <!-- Google Apps Script Embedded Iframe -->
   <iframe id="app-iframe" src="https://script.google.com/macros/s/AKfycbyLctKbGla0U2rUAhQ9LhtM_mP12UItS5qQyspteKhVkqED4K7Vm9f_oxRUJZthzARDdw/exec"></iframe>
+
+  <!-- ZETTBOT: Floating Action Reload Button (Terlihat Eksklusif di PWA Standalone Mode) -->
+  <button id="pwa-reload-btn" onclick="checkNetworkAndReload()" title="Reload Aplikasi ( GAS Force Sync )">
+    <i class="fa-solid fa-arrows-rotate"></i>
+  </button>
+
+  <!-- Toast Notifikasi Update Versi PWA Vercel -->
+  <div id="pwa-update-toast">
+    <span class="toast-text">Pembaruan AuditPro Tersedia!</span>
+    <button class="toast-btn" onclick="window.location.reload(true)">Perbarui</button>
+  </div>
 
   <script>
     const iframe = document.getElementById('app-iframe');
     const splashScreen = document.getElementById('splash-screen');
+    const offlineScreen = document.getElementById('offline-screen');
+    const updateToast = document.getElementById('pwa-update-toast');
 
     // 1. Pendeteksi Iframe Selesai Memuat (Sembunyikan Splash Screen)
     iframe.onload = function() {
@@ -310,31 +427,46 @@
       }
     });
 
-    // Tombol Coba Lagi Manual
+    // ZETTBOT UPDATE: Tombol Reload Cerdas (Mengatasi Caching Agresif Iframe)
     function checkNetworkAndReload() {
       if (navigator.onLine) {
         offlineScreen.style.display = 'none';
         splashScreen.style.visibility = 'visible';
         splashScreen.style.opacity = '1';
         iframe.style.display = 'block';
-        iframe.src = iframe.src; // Muat ulang paksa iframe
+        
+        // Memaksa iframe GAS memuat ulang data murni dari Server Google
+        iframe.src = iframe.src; 
       } else {
         // Efek getar kecil pada kartu offline jika ditekan saat masih offline
         const card = document.querySelector('.glass-card');
-        card.style.transform = 'scale(0.98)';
-        setTimeout(() => { card.style.transform = 'scale(1)'; }, 100);
+        if(card) {
+          card.style.transform = 'scale(0.98)';
+          setTimeout(() => { card.style.transform = 'scale(1)'; }, 100);
+        }
       }
     }
 
     // Jalankan pengecekan status jaringan di awal
     updateNetworkStatus();
 
-    // 4. Registrasi Service Worker PWA Secara Mulus
+    // 4. Registrasi Service Worker PWA Secara Mulus + Deteksi Pembaruan Versi
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
           .then((registration) => {
             console.log('✓ Service Worker AuditPro berhasil terdaftar di domain Vercel dengan skope:', registration.scope);
+
+            // Listener untuk mendeteksi update berkas sw.js baru
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  // Munculkan toast update jika PWA terinstal mendeteksi versi cache baru
+                  updateToast.classList.add('show');
+                }
+              });
+            });
           })
           .catch((error) => {
             console.error('... Registrasi Service Worker gagal:', error);
