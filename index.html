@@ -244,25 +244,12 @@
     </div>
   </div>
 
-  <!-- Zettbos Premium Offline Screen -->
-  <div id="offline-screen">
-    <div class="glass-card">
-      <div class="offline-icon-wrapper">
-        <i class="fa-solid fa-wifi"></i>
-      </div>
-      <h2 class="offline-title">Koneksi Terputus</h2>
-      <p class="offline-desc">Aplikasi mendeteksi bahwa perangkat Anda sedang offline. Silakan periksa jaringan internet Anda dan coba lagi.</p>
-      <button class="retry-btn" onclick="checkNetworkAndReload()"> Coba Hubungkan Kembali </button>
-    </div>
-  </div>
-
   <!-- Google Apps Script Embedded Iframe -->
   <iframe id="app-iframe" src="https://script.google.com/macros/s/AKfycbyLctKbGla0U2rUAhQ9LhtM_mP12UItS5qQyspteKhVkqED4K7Vm9f_oxRUJZthzARDdw/exec"></iframe>
 
   <script>
     const iframe = document.getElementById('app-iframe');
     const splashScreen = document.getElementById('splash-screen');
-    const offlineScreen = document.getElementById('offline-screen');
 
     // 1. Pendeteksi Iframe Selesai Memuat (Sembunyikan Splash Screen)
     iframe.onload = function() {
