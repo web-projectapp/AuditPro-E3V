@@ -136,7 +136,7 @@
       z-index: 9998;
       padding: 24px;
       text-align: center;
-      display: none; /* Hanya aktif saat koneksi offline */
+      display: none; /* Hanya aktif saat koneksi offline untuk peran yang dilarang */
     }
 
     .glass-card {
@@ -203,31 +203,6 @@
       box-shadow: 0 5px 10px rgba(16, 185, 129, 0.15);
     }
 
-    /* Banner Mode Offline Khusus Pengawas & Auditor (Non-blocking) */
-    #offline-banner-pwa {
-      display: none;
-      position: fixed;
-      top: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 92%;
-      max-width: 620px;
-      background: rgba(9, 13, 22, 0.85);
-      border: 1.5px solid rgba(245, 158, 11, 0.4);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      color: #fff;
-      padding: 16px 20px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 700;
-      z-index: 10000;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-      box-sizing: border-box;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      animation: bannerSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
     /* Keyframe Animasi */
     @keyframes pulseGlow {
       0%, 100% {
@@ -252,11 +227,6 @@
       50% { left: 40%; width: 45%; }
       100% { left: 100%; width: 30%; }
     }
-
-    @keyframes bannerSlideIn {
-      from { transform: translate(-50%, -40px); opacity: 0; }
-      to { transform: translate(-50%, 0); opacity: 1; }
-    }
   </style>
 </head>
 <body>
@@ -271,19 +241,6 @@
     <span class="loading-subtitle">Sistem Monitoring</span>
     <div class="loading-bar-wrapper">
       <div class="loading-bar-progress"></div>
-    </div>
-  </div>
-
-  <!-- Banner Mode Offline Mengambang Khusus Pengawas & Auditor (Zettbos Style) -->
-  <div id="offline-banner-pwa">
-    <div style="display: flex; align-items: center; gap: 14px;">
-      <div style="width: 38px; height: 38px; border-radius: 50%; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.25); display: flex; align-items: center; justify-content: center; color: #f59e0b; font-size: 16px; shrink-0: 0;">
-        <i class="fa-solid fa-wifi-slash animate-pulse"></i>
-      </div>
-      <div style="flex: 1; text-align: left;">
-        <p style="margin: 0; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #f59e0b;">Sinyal Terputus - Mode Kerja Offline Aktif</p>
-        <p style="margin: 3px 0 0 0; color: #94a3b8; font-size: 10px; line-height: 1.4;">Terhubung sebagai <span id="offline-role-label" style="font-weight: 800; color: #fff;">Pengawas/Auditor</span>. Anda tetap dapat masuk dan mengisi formulir. Data disimpan aman di memori lokal & sinkron otomatis saat online kembali.</p>
-      </div>
     </div>
   </div>
 
@@ -306,8 +263,6 @@
     const iframe = document.getElementById('app-iframe');
     const splashScreen = document.getElementById('splash-screen');
     const offlineScreen = document.getElementById('offline-screen');
-    const offlineBanner = document.getElementById('offline-banner-pwa');
-    const roleLabel = document.getElementById('offline-role-label');
 
     // 1. Pendeteksi Iframe Selesai Memuat (Sembunyikan Splash Screen)
     iframe.onload = function() {
@@ -325,29 +280,25 @@
       return localStorage.getItem('sawitpro_role') || '';
     }
 
-    // 2. Pendeteksi Keadaan Jaringan Lintas-Peran (Online / Offline Segregation)
+    // 2. Pendeteksi Keadaan Jaringan Lintas-Peran Tanpa Banner (Silent Offline Mode)
     function updateNetworkStatus() {
       const savedRole = getSavedRole().toLowerCase();
       // Verifikasi apakah peran saat ini diizinkan bekerja offline (Pengawas & Auditor)
-      const isOfflineCapable = savedRole.includes('Pengawas') || savedRole.includes('Auditor');
+      const isOfflineCapable = savedRole.includes('pengawas') || savedRole.includes('auditor');
 
       if (navigator.onLine) {
         offlineScreen.style.display = 'none';
-        offlineBanner.style.display = 'none';
         iframe.style.display = 'block';
       } else {
         splashScreen.style.visibility = 'hidden'; // Matikan loader jika offline terjadi di awal
         
         if (isOfflineCapable) {
-          // KHUSUS PENGAWAS & AUDITOR: Jangan blokir layar penuh, biarkan iframe lokal berjalan dengan notifikasi banner
+          // KHUSUS PENGAWAS & AUDITOR: Bebaskan ruang kerja tanpa banner pengganggu, biarkan aplikasi berjalan hening
           offlineScreen.style.display = 'none';
-          roleLabel.innerText = localStorage.getItem('sawitpro_role');
-          offlineBanner.style.display = 'block';
           iframe.style.display = 'block';
         } else {
           // ADMIN, MASTER ATAU BELUM LOGIN (ANONYMOUS): Blokir layar penuh demi keamanan data
           offlineScreen.style.display = 'flex';
-          offlineBanner.style.display = 'none';
           iframe.style.display = 'none';
         }
       }
@@ -363,7 +314,7 @@
         if (event.data.type === 'SET_ROLE') {
           localStorage.setItem('sawitpro_role', event.data.role);
           localStorage.setItem('sawitpro_username', event.data.username || '');
-          updateNetworkStatus(); // Langsung perbarui tampilan jika terjadi pergantian status jaringan
+          updateNetworkStatus(); // Langsung perbarui perlakuan jaringan
         } else if (event.data.type === 'CLEAR_ROLE') {
           localStorage.removeItem('sawitpro_role');
           localStorage.removeItem('sawitpro_username');
@@ -399,7 +350,7 @@
             console.log('✓ Service Worker AuditPro berhasil terdaftar di domain Vercel dengan skope:', registration.scope);
           })
           .catch((error) => {
-            console.error('✗ Registrasi Service Worker gagal:', error);
+            console.error('... Registrasi Service Worker gagal:', error);
           });
       });
     }
