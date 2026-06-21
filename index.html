@@ -1,488 +1,552 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AuditPro</title> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AuditPro</title>
 
-  <!-- Tautan Manifest PWA -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#10b981">
+    <!-- Tautan Manifest PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#10b981">
 
-  <!-- Meta Tag Optimasi iOS (Safari PWA) -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="AuditPro">
-  <link rel="apple-touch-icon" href="icon.svg">
+    <!-- Meta Tag Optimasi iOS (Safari PWA) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AuditPro">
+    <link rel="apple-touch-icon" href="icon.svg">
 
-  <!-- Link Google Fonts & FontAwesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;800&display=swap" rel="stylesheet">
+    <!-- Link Google Fonts & FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;800&display=swap"
+        rel="stylesheet">
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-    body, html {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background-color: #0d1117;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-    /* Iframe Penampung Google Apps Script */
-    iframe {
-      border: none;
-      width: 100vw;
-      height: 100vh;
-      display: block;
-      opacity: 0;
-      transition: opacity 0.5s ease-in-out;
-    }
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #0d1117;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    /* Zettbos Premium Splash Screen Loader */
-    #splash-screen {
-      position: fixed;
-      inset: 0;
-      background-color: #090d16;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s;
-    }
+        /* Iframe Penampung Google Apps Script */
+        iframe {
+            border: none;
+            width: 100vw;
+            height: 100vh;
+            display: block;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
 
-    .logo-container {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 120px;
-      height: 120px;
-      margin-bottom: 24px;
-    }
+        /* Zettbos Premium Splash Screen Loader */
+        #splash-screen {
+            position: fixed;
+            inset: 0;
+            background-color: #090d16;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s;
+        }
 
-    /* Efek Neon Glow Berdenyut */
-    .glow-ring {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      border: 2px stroke rgba(16, 185, 129, 0.2);
-      box-shadow: 0 0 30px rgba(16, 185, 129, 0.15);
-      animation: pulseGlow 2s infinite ease-in-out;
-    }
+        .logo-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 120px;
+            height: 120px;
+            margin-bottom: 24px;
+        }
 
-    /* Ikon Vektor Premium Sawit Audit */
-    .logo-icon {
-      width: 90px;
-      height: 90px;
-      filter: drop-shadow(0 0 12px rgba(16, 185, 129, 0.5));
-      animation: logoFloat 3s infinite ease-in-out;
-      z-index: 2;
-    }
+        /* Efek Neon Glow Berdenyut */
+        .glow-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px stroke rgba(16, 185, 129, 0.2);
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.15);
+            animation: pulseGlow 2s infinite ease-in-out;
+        }
 
-    /* Teks Loading Premium */
-    .loading-title {
-      font-size: 20px;
-      font-weight: 800;
-      color: #ffffff;
-      letter-spacing: 1px;
-      margin: 0;
-      text-transform: uppercase;
-    }
+        /* Ikon Vektor Premium Sawit Audit */
+        .logo-icon {
+            width: 90px;
+            height: 90px;
+            filter: drop-shadow(0 0 12px rgba(16, 185, 129, 0.5));
+            animation: logoFloat 3s infinite ease-in-out;
+            z-index: 2;
+        }
 
-    .loading-subtitle {
-      font-size: 11px;
-      font-weight: 600;
-      color: #10b981;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      margin-top: 6px;
-      opacity: 0.8;
-    }
+        /* Teks Loading Premium */
+        .loading-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 1px;
+            margin: 0;
+            text-transform: uppercase;
+        }
 
-    .loading-bar-wrapper {
-      width: 180px;
-      height: 4px;
-      background-color: rgba(255, 255, 255, 0.05);
-      border-radius: 10px;
-      margin-top: 28px;
-      overflow: hidden;
-      position: relative;
-    }
+        .loading-subtitle {
+            font-size: 11px;
+            font-weight: 600;
+            color: #10b981;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-top: 6px;
+            opacity: 0.8;
+        }
 
-    .loading-bar-progress {
-      height: 100%;
-      background: linear-gradient(90deg, #10b981, #34d399);
-      width: 30%;
-      border-radius: 10px;
-      position: absolute;
-      animation: shiftProgress 1.6s infinite ease-in-out;
-    }
+        .loading-bar-wrapper {
+            width: 180px;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-top: 28px;
+            overflow: hidden;
+            position: relative;
+        }
 
-    /* Layar Offline Hard-Block */
-    #offline-screen {
-      position: fixed;
-      inset: 0;
-      background-color: #090d16;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 9998;
-      padding: 24px;
-      text-align: center;
-      display: none; 
-    }
+        .loading-bar-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #34d399);
+            width: 30%;
+            border-radius: 10px;
+            position: absolute;
+            animation: shiftProgress 1.6s infinite ease-in-out;
+        }
 
-    .glass-card {
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      padding: 40px 32px;
-      border-radius: 28px;
-      max-width: 400px;
-      width: 100%;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+        /* Layar Offline Hard-Block */
+        #offline-screen {
+            position: fixed;
+            inset: 0;
+            background-color: #090d16;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9998;
+            padding: 24px;
+            text-align: center;
+            display: none;
+        }
 
-    .offline-icon-wrapper {
-      width: 80px;
-      height: 80px;
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.2);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 24px;
-      color: #ef4444;
-      font-size: 32px;
-    }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 40px 32px;
+            border-radius: 28px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-    .offline-title {
-      color: #ffffff;
-      font-size: 18px;
-      font-weight: 800;
-      margin: 0 0 8px 0;
-    }
+        .offline-icon-wrapper {
+            width: 80px;
+            height: 80px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            color: #ef4444;
+            font-size: 32px;
+        }
 
-    .offline-desc {
-      color: #94a3b8;
-      font-size: 12px;
-      line-height: 1.6;
-      margin: 0 0 28px 0;
-    }
+        .offline-title {
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 800;
+            margin: 0 0 8px 0;
+        }
 
-    .retry-btn {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, #10b981, #059669);
-      color: #ffffff;
-      border: none;
-      border-radius: 14px;
-      font-size: 13px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      cursor: pointer;
-      box-shadow: 0 10px 20px rgba(16, 185, 129, 0.25);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
+        .offline-desc {
+            color: #94a3b8;
+            font-size: 12px;
+            line-height: 1.6;
+            margin: 0 0 28px 0;
+        }
 
-    .retry-btn:active {
-      transform: scale(0.97);
-      box-shadow: 0 5px 10px rgba(16, 185, 129, 0.15);
-    }
+        .retry-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
+            border: none;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.25);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
 
-    /* Floating Action Button (Reload PWA) */
-    #pwa-reload-btn {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      width: 48px;
-      height: 48px;
-      background: rgba(16, 185, 129, 0.9);
-      color: white;
-      border: 1px solid rgba(52, 211, 153, 0.4);
-      border-radius: 50%;
-      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
-      display: none; 
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      cursor: pointer;
-      z-index: 999;
-      transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
-      -webkit-tap-highlight-color: transparent;
-    }
+        .retry-btn:active {
+            transform: scale(0.97);
+            box-shadow: 0 5px 10px rgba(16, 185, 129, 0.15);
+        }
 
-    #pwa-reload-btn:active {
-      transform: scale(0.9) rotate(45deg);
-      background: #059669;
-      box-shadow: 0 5px 15px rgba(16, 185, 129, 0.2);
-    }
+        /* Floating Action Button (Reload PWA) */
+        #pwa-reload-btn {
+            position: fixed;
+            bottom: 16px;
+            right: 16px;
+            width: 38px;
+            height: 38px;
+            background: rgba(16, 185, 129, 0.9);
+            color: white;
+            border: 1px solid rgba(52, 211, 153, 0.4);
+            border-radius: 50%;
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            cursor: pointer;
+            z-index: 40; /* Lower z-index so it sits behind sidebars/modals */
+            transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    @media (display-mode: standalone) {
-      #pwa-reload-btn {
-        display: flex !important;
-      }
-    }
+        #pwa-reload-btn:active {
+            transform: scale(0.9) rotate(45deg);
+            background: #059669;
+            box-shadow: 0 3px 10px rgba(16, 185, 129, 0.2);
+        }
 
-    @media (display-mode: fullscreen) {
-      #pwa-reload-btn {
-        display: flex !important;
-      }
-    }
+        #pwa-reload-btn.hidden-btn {
+            display: none !important;
+        }
 
-    /* Toast Notification Pembaruan Versi PWA */
-    #pwa-update-toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: rgba(15, 23, 42, 0.95);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      padding: 14px 20px;
-      border-radius: 16px;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      z-index: 1000;
-      opacity: 0;
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s;
-    }
+        @media (display-mode: standalone) {
+            #pwa-reload-btn {
+                display: flex !important;
+            }
+            #pwa-reload-btn.hidden-btn {
+                display: none !important;
+            }
+        }
 
-    #pwa-update-toast.show {
-      transform: translateX(-50%) translateY(0);
-      opacity: 1;
-    }
+        @media (display-mode: fullscreen) {
+            #pwa-reload-btn {
+                display: flex !important;
+            }
+            #pwa-reload-btn.hidden-btn {
+                display: none !important;
+            }
+        }
 
-    .toast-text {
-      color: white;
-      font-size: 11px;
-      font-weight: bold;
-      letter-spacing: 0.5px;
-    }
+        /* Toast Notification Pembaruan Versi PWA */
+        #pwa-update-toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 14px 20px;
+            border-radius: 16px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            z-index: 1000;
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s;
+        }
 
-    .toast-btn {
-      background: #10b981;
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 10px;
-      font-weight: 800;
-      cursor: pointer;
-      text-transform: uppercase;
-      box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
-    }
+        #pwa-update-toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
 
-    /* Keyframe Animasi */
-    @keyframes pulseGlow {
-      0%, 100% {
-        transform: scale(1);
-        opacity: 0.5;
-        box-shadow: 0 0 30px rgba(16, 185, 129, 0.15);
-      }
-      50% {
-        transform: scale(1.1);
-        opacity: 0.9;
-        box-shadow: 0 0 50px rgba(16, 185, 129, 0.35);
-      }
-    }
+        .toast-text {
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
 
-    @keyframes logoFloat {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
+        .toast-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+        }
 
-    @keyframes shiftProgress {
-      0% { left: -30%; width: 30%; }
-      50% { left: 40%; width: 45%; }
-      100% { left: 100%; width: 30%; }
-    }
-  </style>
+        /* Keyframe Animasi */
+        @keyframes pulseGlow {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.5;
+                box-shadow: 0 0 30px rgba(16, 185, 129, 0.15);
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.9;
+                box-shadow: 0 0 50px rgba(16, 185, 129, 0.35);
+            }
+        }
+
+        @keyframes logoFloat {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        @keyframes shiftProgress {
+            0% {
+                left: -30%;
+                width: 30%;
+            }
+
+            50% {
+                left: 40%;
+                width: 45%;
+            }
+
+            100% {
+                left: 100%;
+                width: 30%;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-  <!-- Zettbos Premium Splash Screen -->
-  <div id="splash-screen">
-    <div class="logo-container">
-      <div class="glow-ring"></div>
-      <!-- ZETTBOT BRAND EMBLEM: Custom Palm & Audit Checklist Vector Logo (Inline SVG) -->
-      <svg viewBox="0 0 512 512" class="logo-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="256" cy="256" r="230" stroke="#ffffff" stroke-width="12" stroke-dasharray="16 12" opacity="0.25" />
-        <circle cx="256" cy="256" r="210" stroke="#ffffff" stroke-width="4" opacity="0.1" />
-        <path d="M 200,420 Q 256,330 256,120" stroke="#34d399" stroke-width="16" stroke-linecap="round" />
-        <path d="M 256,150 Q 140,160 110,210 Q 180,210 256,180" fill="#ffffff" opacity="0.9" />
-        <path d="M 256,210 Q 120,240 90,290 Q 170,280 256,240" fill="#ffffff" opacity="0.9" />
-        <path d="M 256,270 Q 110,320 80,370 Q 160,350 256,300" fill="#ffffff" opacity="0.9" />
-        <path d="M 256,150 Q 372,160 402,210 Q 332,210 256,180" fill="#ffffff" opacity="0.9" />
-        <path d="M 256,210 Q 392,240 422,290 Q 342,280 256,240" fill="#ffffff" opacity="0.9" />
-        <path d="M 256,270 Q 402,320 432,370 Q 352,350 256,300" fill="#ffffff" opacity="0.9" />
-        <g transform="translate(360, 140)">
-          <circle cx="0" cy="0" r="54" fill="#064e3b" stroke="#34d399" stroke-width="10" />
-          <path d="M -20,-4 L -6,12 L 20,-10" stroke="#34d399" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
-        </g>
-      </svg>
+    <!-- Zettbos Premium Splash Screen -->
+    <div id="splash-screen">
+        <div class="logo-container">
+            <div class="glow-ring"></div>
+            <!-- ZETTBOT BRAND EMBLEM: Custom Palm & Audit Checklist Vector Logo (Inline SVG) -->
+            <svg viewBox="0 0 512 512" class="logo-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="256" cy="256" r="230" stroke="#ffffff" stroke-width="12" stroke-dasharray="16 12"
+                    opacity="0.25" />
+                <circle cx="256" cy="256" r="210" stroke="#ffffff" stroke-width="4" opacity="0.1" />
+                <path d="M 200,420 Q 256,330 256,120" stroke="#34d399" stroke-width="16" stroke-linecap="round" />
+                <path d="M 256,150 Q 140,160 110,210 Q 180,210 256,180" fill="#ffffff" opacity="0.9" />
+                <path d="M 256,210 Q 120,240 90,290 Q 170,280 256,240" fill="#ffffff" opacity="0.9" />
+                <path d="M 256,270 Q 110,320 80,370 Q 160,350 256,300" fill="#ffffff" opacity="0.9" />
+                <path d="M 256,150 Q 372,160 402,210 Q 332,210 256,180" fill="#ffffff" opacity="0.9" />
+                <path d="M 256,210 Q 392,240 422,290 Q 342,280 256,240" fill="#ffffff" opacity="0.9" />
+                <path d="M 256,270 Q 402,320 432,370 Q 352,350 256,300" fill="#ffffff" opacity="0.9" />
+                <g transform="translate(360, 140)">
+                    <circle cx="0" cy="0" r="54" fill="#064e3b" stroke="#34d399" stroke-width="10" />
+                    <path d="M -20,-4 L -6,12 L 20,-10" stroke="#34d399" stroke-width="12" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </g>
+            </svg>
+        </div>
+        <h1 class="loading-title">AuditPro</h1>
+        <span class="loading-subtitle">Sistem Monitoring</span>
+        <div class="loading-bar-wrapper">
+            <div class="loading-bar-progress"></div>
+        </div>
     </div>
-    <h1 class="loading-title">AuditPro</h1>
-    <span class="loading-subtitle">Sistem Monitoring</span>
-    <div class="loading-bar-wrapper">
-      <div class="loading-bar-progress"></div>
+
+    <!-- Layar Offline Hard-Block (Hanya untuk Admin/Master) -->
+    <div id="offline-screen">
+        <div class="glass-card">
+            <div class="offline-icon-wrapper">
+                <i class="fa-solid fa-wifi"></i>
+            </div>
+            <h2 class="offline-title">Koneksi Terputus</h2>
+            <p class="offline-desc">Sesi administratif ditangguhkan. Silakan hubungkan kembali perangkat Anda ke
+                internet untuk melanjutkan.</p>
+            <button class="retry-btn" onclick="checkNetworkAndReload()">Coba Lagi</button>
+        </div>
     </div>
-  </div>
 
-  <!-- Layar Offline Hard-Block (Hanya untuk Admin/Master) -->
-  <div id="offline-screen">
-    <div class="glass-card">
-      <div class="offline-icon-wrapper">
-        <i class="fa-solid fa-wifi"></i>
-      </div>
-      <h2 class="offline-title">Koneksi Terputus</h2>
-      <p class="offline-desc">Sesi administratif ditangguhkan. Silakan hubungkan kembali perangkat Anda ke internet untuk melanjutkan.</p>
-      <button class="retry-btn" onclick="checkNetworkAndReload()">Coba Lagi</button>
+    <!-- Google Apps Script Embedded Iframe -->
+    <iframe id="app-iframe"
+        src="https://script.google.com/macros/s/AKfycbyLctKbGla0U2rUAhQ9LhtM_mP12UItS5qQyspteKhVkqED4K7Vm9f_oxRUJZthzARDdw/exec"></iframe>
+
+    <!-- Floating Action Button (Reload PWA) -->
+    <button id="pwa-reload-btn" onclick="checkNetworkAndReload()" title="Reload Aplikasi">
+        <i class="fa-solid fa-arrows-rotate"></i>
+    </button>
+
+    <!-- Toast Notifikasi Update Versi PWA Vercel -->
+    <div id="pwa-update-toast">
+        <span class="toast-text">Pembaruan AuditPro Tersedia!</span>
+        <button class="toast-btn" onclick="window.location.reload(true)">Perbarui</button>
     </div>
-  </div>
 
-  <!-- Google Apps Script Embedded Iframe -->
-  <iframe id="app-iframe" src="https://script.google.com/macros/s/AKfycbyLctKbGla0U2rUAhQ9LhtM_mP12UItS5qQyspteKhVkqED4K7Vm9f_oxRUJZthzARDdw/exec"></iframe>
+    <script>
+        const iframe = document.getElementById('app-iframe');
+        const splashScreen = document.getElementById('splash-screen');
+        const offlineScreen = document.getElementById('offline-screen');
+        const updateToast = document.getElementById('pwa-update-toast');
 
-  <!-- Floating Action Button (Reload PWA) -->
-  <button id="pwa-reload-btn" onclick="checkNetworkAndReload()" title="Reload Aplikasi">
-    <i class="fa-solid fa-arrows-rotate"></i>
-  </button>
+        // 1. Pendeteksi Iframe Selesai Memuat (Sembunyikan Splash Screen)
+        iframe.onload = function () {
+            if (navigator.onLine) {
+                splashScreen.style.opacity = '0';
+                iframe.style.opacity = '1';
+                setTimeout(() => {
+                    splashScreen.style.visibility = 'hidden';
+                }, 600);
+            }
+        };
 
-  <!-- Toast Notifikasi Update Versi PWA Vercel -->
-  <div id="pwa-update-toast">
-    <span class="toast-text">Pembaruan AuditPro Tersedia!</span>
-    <button class="toast-btn" onclick="window.location.reload(true)">Perbarui</button>
-  </div>
-
-  <script>
-    const iframe = document.getElementById('app-iframe');
-    const splashScreen = document.getElementById('splash-screen');
-    const offlineScreen = document.getElementById('offline-screen');
-    const updateToast = document.getElementById('pwa-update-toast');
-
-    // 1. Pendeteksi Iframe Selesai Memuat (Sembunyikan Splash Screen)
-    iframe.onload = function() {
-      if (navigator.onLine) {
-        splashScreen.style.opacity = '0';
-        iframe.style.opacity = '1';
-        setTimeout(() => {
-          splashScreen.style.visibility = 'hidden';
-        }, 600);
-      }
-    };
-
-    // Ambil peran (role) pengguna aktif yang tersimpan
-    function getSavedRole() {
-      return localStorage.getItem('sawitpro_role') || '';
-    }
-
-    // 2. Pendeteksi Keadaan Jaringan Lintas-Peran Tanpa Banner (Silent Offline Mode)
-    function updateNetworkStatus() {
-      const savedRole = getSavedRole().toLowerCase();
-      // Verifikasi apakah peran saat ini diizinkan bekerja offline (Pengawas & Auditor)
-      const isOfflineCapable = savedRole.includes('pengawas') || savedRole.includes('auditor');
-
-      if (navigator.onLine) {
-        offlineScreen.style.display = 'none';
-        iframe.style.display = 'block';
-      } else {
-        splashScreen.style.visibility = 'hidden'; // Matikan loader jika offline terjadi di awal
-        
-        if (isOfflineCapable) {
-          // KHUSUS PENGAWAS & AUDITOR: Bebaskan ruang kerja tanpa banner pengganggu, biarkan aplikasi berjalan hening
-          offlineScreen.style.display = 'none';
-          iframe.style.display = 'block';
-        } else {
-          // ADMIN, MASTER ATAU BELUM LOGIN (ANONYMOUS): Layar diblokir penuh demi keamanan data
-          offlineScreen.style.display = 'flex';
-          iframe.style.display = 'none';
+        // Ambil peran (role) pengguna aktif yang tersimpan
+        function getSavedRole() {
+            return localStorage.getItem('sawitpro_role') || '';
         }
-      }
-    }
 
-    // Event Listener Jaringan
-    window.addEventListener('online', updateNetworkStatus);
-    window.addEventListener('offline', updateNetworkStatus);
+        // 2. Pendeteksi Keadaan Jaringan Lintas-Peran Tanpa Banner (Silent Offline Mode)
+        function updateNetworkStatus() {
+            const savedRole = getSavedRole().toLowerCase();
+            // Verifikasi apakah peran saat ini diizinkan bekerja offline (Pengawas & Auditor)
+            const isOfflineCapable = savedRole.includes('pengawas') || savedRole.includes('auditor');
 
-    // 3. Listener Komunikasi Lintas Domain (postMessage API untuk sinkronisasi Sesi)
-    window.addEventListener('message', function(event) {
-      if (event.data) {
-        if (event.data.type === 'SET_ROLE') {
-          localStorage.setItem('sawitpro_role', event.data.role);
-          localStorage.setItem('sawitpro_username', event.data.username || '');
-          updateNetworkStatus(); // Langsung perbarui perlakuan jaringan
-        } else if (event.data.type === 'CLEAR_ROLE') {
-          localStorage.removeItem('sawitpro_role');
-          localStorage.removeItem('sawitpro_username');
-          updateNetworkStatus();
-        }
-      }
-    });
+            if (navigator.onLine) {
+                offlineScreen.style.display = 'none';
+                iframe.style.display = 'block';
+            } else {
+                splashScreen.style.visibility = 'hidden'; // Matikan loader jika offline terjadi di awal
 
-    // Tombol Reload Cerdas (Mengatasi Caching Agresif Iframe)
-    function checkNetworkAndReload() {
-      if (navigator.onLine) {
-        offlineScreen.style.display = 'none';
-        splashScreen.style.visibility = 'visible';
-        splashScreen.style.opacity = '1';
-        iframe.style.display = 'block';
-        
-        // Memaksa iframe GAS memuat ulang data murni dari Server Google
-        iframe.src = iframe.src; 
-      } else {
-        // Efek getar kecil pada kartu offline jika ditekan saat masih offline
-        const card = document.querySelector('.glass-card');
-        if(card) {
-          card.style.transform = 'scale(0.98)';
-          setTimeout(() => { card.style.transform = 'scale(1)'; }, 100);
-        }
-      }
-    }
-
-    // Jalankan pengecekan status jaringan di awal
-    updateNetworkStatus();
-
-    // 4. Registrasi Service Worker PWA Secara Mulus + Deteksi Pembaruan Versi
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then((registration) => {
-            console.log('✓ Service Worker AuditPro berhasil terdaftar di domain Vercel dengan skope:', registration.scope);
-
-            // Listener untuk mendeteksi update berkas sw.js baru
-            registration.addEventListener('updatefound', () => {
-              const newWorker = registration.installing;
-              newWorker.addEventListener('statechange', () => {
-                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  // Munculkan toast update jika PWA terinstal mendeteksi versi cache baru
-                  updateToast.classList.add('show');
+                if (isOfflineCapable) {
+                    // KHUSUS PENGAWAS & AUDITOR: Bebaskan ruang kerja tanpa banner pengganggu, biarkan aplikasi berjalan hening
+                    offlineScreen.style.display = 'none';
+                    iframe.style.display = 'block';
+                } else {
+                    // ADMIN, MASTER ATAU BELUM LOGIN (ANONYMOUS): Layar diblokir penuh demi keamanan data
+                    offlineScreen.style.display = 'flex';
+                    iframe.style.display = 'none';
                 }
-              });
+            }
+        }
+
+        // Event Listener Jaringan
+        window.addEventListener('online', updateNetworkStatus);
+        window.addEventListener('offline', updateNetworkStatus);
+
+        // 3. Listener Komunikasi Lintas Domain (postMessage API untuk sinkronisasi Sesi & UI)
+        window.addEventListener('message', function (event) {
+            if (event.data) {
+                if (event.data.type === 'SET_ROLE') {
+                    localStorage.setItem('sawitpro_role', event.data.role);
+                    localStorage.setItem('sawitpro_username', event.data.username || '');
+                    updateNetworkStatus(); // Langsung perbarui perlakuan jaringan
+                } else if (event.data.type === 'CLEAR_ROLE') {
+                    localStorage.removeItem('sawitpro_role');
+                    localStorage.removeItem('sawitpro_username');
+                    updateNetworkStatus();
+                } else if (event.data.type === 'SHOW_SPLASH') {
+                    const subtitle = event.data.subtitle || 'Sistem Monitoring';
+                    const subtitleEl = document.querySelector('.loading-subtitle');
+                    if (subtitleEl) subtitleEl.innerText = subtitle;
+                    splashScreen.style.visibility = 'visible';
+                    splashScreen.style.opacity = '1';
+                    // Sembunyikan tombol reload ketika splash screen tampil
+                    const reloadBtn = document.getElementById('pwa-reload-btn');
+                    if (reloadBtn) reloadBtn.classList.add('hidden-btn');
+                } else if (event.data.type === 'HIDE_SPLASH') {
+                    splashScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        splashScreen.style.visibility = 'hidden';
+                    }, 600);
+                    // Tampilkan kembali tombol reload
+                    const reloadBtn = document.getElementById('pwa-reload-btn');
+                    if (reloadBtn) reloadBtn.classList.remove('hidden-btn');
+                } else if (event.data.type === 'HIDE_RELOAD_BTN') {
+                    const reloadBtn = document.getElementById('pwa-reload-btn');
+                    if (reloadBtn) reloadBtn.classList.add('hidden-btn');
+                } else if (event.data.type === 'SHOW_RELOAD_BTN') {
+                    const reloadBtn = document.getElementById('pwa-reload-btn');
+                    if (reloadBtn) reloadBtn.classList.remove('hidden-btn');
+                }
+            }
+        });
+
+        // Tombol Reload Cerdas (Mengatasi Caching Agresif Iframe)
+        function checkNetworkAndReload() {
+            if (navigator.onLine) {
+                offlineScreen.style.display = 'none';
+                splashScreen.style.visibility = 'visible';
+                splashScreen.style.opacity = '1';
+                iframe.style.display = 'block';
+
+                // Memaksa iframe GAS memuat ulang data murni dari Server Google
+                iframe.src = iframe.src;
+            } else {
+                // Efek getar kecil pada kartu offline jika ditekan saat masih offline
+                const card = document.querySelector('.glass-card');
+                if (card) {
+                    card.style.transform = 'scale(0.98)';
+                    setTimeout(() => { card.style.transform = 'scale(1)'; }, 100);
+                }
+            }
+        }
+
+        // Jalankan pengecekan status jaringan di awal
+        updateNetworkStatus();
+
+        // 4. Registrasi Service Worker PWA Secara Mulus + Deteksi Pembaruan Versi
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((registration) => {
+                        console.log('✓ Service Worker AuditPro berhasil terdaftar di domain Vercel dengan skope:', registration.scope);
+
+                        // Listener untuk mendeteksi update berkas sw.js baru
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // Munculkan toast update jika PWA terinstal mendeteksi versi cache baru
+                                    updateToast.classList.add('show');
+                                }
+                            });
+                        });
+                    })
+                    .catch((error) => {
+                        console.error('... Registrasi Service Worker gagal:', error);
+                    });
             });
-          })
-          .catch((error) => {
-            console.error('... Registrasi Service Worker gagal:', error);
-          });
-      });
-    }
-  </script>
+        }
+    </script>
 
 </body>
+
 </html>
