@@ -209,6 +209,31 @@
             box-shadow: 0 5px 10px rgba(16, 185, 129, 0.15);
         }
 
+        .bypass-btn {
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            color: #10b981;
+            border: 2px solid #10b981;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: all 0.2s, box-shadow 0.2s;
+        }
+
+        .bypass-btn:hover {
+            background: rgba(16, 185, 129, 0.08);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.1);
+        }
+
+        .bypass-btn:active {
+            transform: scale(0.97);
+        }
+
         /* Floating Action Button (Reload PWA) */
         #pwa-reload-btn {
             position: fixed;
@@ -226,7 +251,8 @@
             justify-content: center;
             font-size: 15px;
             cursor: pointer;
-            z-index: 40; /* Lower z-index so it sits behind sidebars/modals */
+            z-index: 40;
+            /* Lower z-index so it sits behind sidebars/modals */
             transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
             -webkit-tap-highlight-color: transparent;
         }
@@ -245,6 +271,7 @@
             #pwa-reload-btn {
                 display: flex !important;
             }
+
             #pwa-reload-btn.hidden-btn {
                 display: none !important;
             }
@@ -254,6 +281,7 @@
             #pwa-reload-btn {
                 display: flex !important;
             }
+
             #pwa-reload-btn.hidden-btn {
                 display: none !important;
             }
@@ -393,6 +421,7 @@
             <p class="offline-desc">Sesi administratif ditangguhkan. Silakan hubungkan kembali perangkat Anda ke
                 internet untuk melanjutkan.</p>
             <button class="retry-btn" onclick="checkNetworkAndReload()">Coba Lagi</button>
+            <button class="bypass-btn" onclick="bypassOfflineScreen()">Lanjutkan Offline</button>
         </div>
     </div>
 
@@ -430,7 +459,10 @@
 
         // Ambil peran (role) pengguna aktif yang tersimpan
         function getSavedRole() {
-            return localStorage.getItem('sawitpro_role') || '';
+            let role = localStorage.getItem('sawitpro_role') || '';
+            // ZETTBOT FIX: Membersihkan tanda kutip pembungkus dan spasi tak terlihat
+            role = role.replace(/^["']|["']$/g, '').trim();
+            return role;
         }
 
         // 2. Pendeteksi Keadaan Jaringan Lintas-Peran Tanpa Banner (Silent Offline Mode)
@@ -438,6 +470,8 @@
             const savedRole = getSavedRole().toLowerCase();
             // Verifikasi apakah peran saat ini diizinkan bekerja offline (Pengawas & Auditor)
             const isOfflineCapable = savedRole.includes('pengawas') || savedRole.includes('auditor');
+
+            console.log("Pengecekan Jaringan - Peran:", savedRole, "| Offline Capable:", isOfflineCapable, "| Online:", navigator.onLine);
 
             if (navigator.onLine) {
                 offlineScreen.style.display = 'none';
@@ -455,6 +489,13 @@
                     iframe.style.display = 'none';
                 }
             }
+        }
+
+        // ZETTBOT FIX: Mengizinkan pengawas, auditor, atau peran apa pun mem-bypass layar offline secara manual jika diperlukan
+        function bypassOfflineScreen() {
+            console.log("Bypass Layar Offline Diaktifkan secara Manual");
+            if (offlineScreen) offlineScreen.style.display = 'none';
+            if (iframe) iframe.style.display = 'block';
         }
 
         // Event Listener Jaringan
