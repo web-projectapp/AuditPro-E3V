@@ -4,7 +4,7 @@
 // Status: Aktif & Mendukung Offline Cache-First
 // ==========================================
 
-const CACHE_NAME = 'auditpro-v1.0';
+const CACHE_NAME = 'auditpro-v1.1';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -74,4 +74,11 @@ self.addEventListener('fetch', (event) => {
       });
     })
   );
+});
+
+// Tambahan listener untuk force-skip waiting dari client
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
