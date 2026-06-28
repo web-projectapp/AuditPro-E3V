@@ -446,16 +446,27 @@
         const offlineScreen = document.getElementById('offline-screen');
         const updateToast = document.getElementById('pwa-update-toast');
 
+        // Helper to hide splash screen and reveal iframe
+        function hideSplashScreen() {
+            splashScreen.style.opacity = '0';
+            iframe.style.opacity = '1';
+            setTimeout(() => {
+                splashScreen.style.visibility = 'hidden';
+            }, 600);
+            // Show reload button if applicable
+            const reloadBtn = document.getElementById('pwa-reload-btn');
+            if (reloadBtn) reloadBtn.classList.remove('hidden-btn');
+        }
+
         // 1. Pendeteksi Iframe Selesai Memuat (Sembunyikan Splash Screen)
         iframe.onload = function () {
-            if (navigator.onLine) {
-                splashScreen.style.opacity = '0';
-                iframe.style.opacity = '1';
-                setTimeout(() => {
-                    splashScreen.style.visibility = 'hidden';
-                }, 600);
-            }
+            hideSplashScreen();
         };
+
+        // Safety timeout: force hide splash screen after 4 seconds to prevent getting stuck
+        setTimeout(() => {
+            hideSplashScreen();
+        }, 4000);
 
         // Ambil peran (role) pengguna aktif yang tersimpan
         function getSavedRole() {
@@ -477,7 +488,7 @@
                 offlineScreen.style.display = 'none';
                 iframe.style.display = 'block';
             } else {
-                splashScreen.style.visibility = 'hidden'; // Matikan loader jika offline terjadi di awal
+                hideSplashScreen(); // Matikan loader jika offline terjadi di awal
 
                 if (isOfflineCapable) {
                     // KHUSUS PENGAWAS & AUDITOR: Bebaskan ruang kerja tanpa banner pengganggu, biarkan aplikasi berjalan hening
