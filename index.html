@@ -437,7 +437,7 @@
     <!-- Toast Notifikasi Update Versi PWA Vercel -->
     <div id="pwa-update-toast">
         <span class="toast-text">Pembaruan AuditPro Tersedia!</span>
-        <button class="toast-btn" onclick="window.location.reload(true)">Perbarui</button>
+        <button class="toast-btn" onclick="forceUpdatePWA()">Perbarui</button>
     </div>
 
     <script>
@@ -445,6 +445,7 @@
         const splashScreen = document.getElementById('splash-screen');
         const offlineScreen = document.getElementById('offline-screen');
         const updateToast = document.getElementById('pwa-update-toast');
+        const APP_VERSION = '1.1'; // PWA System Version
 
         // Helper to hide splash screen and reveal iframe
         function hideSplashScreen() {
@@ -456,6 +457,11 @@
             // Show reload button if applicable
             const reloadBtn = document.getElementById('pwa-reload-btn');
             if (reloadBtn) reloadBtn.classList.remove('hidden-btn');
+
+            // Send version information to iframe when loaded/displayed
+            if (iframe && iframe.contentWindow) {
+                iframe.contentWindow.postMessage({ type: 'SET_VERSION', version: APP_VERSION }, '*');
+            }
         }
 
         // 1. Pendeteksi Iframe Selesai Memuat (Sembunyikan Splash Screen)
@@ -551,6 +557,17 @@
             }
         });
 
+        // Fungsi untuk memaksa pembaruan PWA saat tombol diklik
+        function forceUpdatePWA() {
+            navigator.serviceWorker.getRegistration().then(reg => {
+                if (reg && reg.waiting) {
+                    reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                } else {
+                    window.location.reload();
+                }
+            });
+        }
+
         // Tombol Reload Cerdas (Mengatasi Caching Agresif Iframe)
         function checkNetworkAndReload() {
             if (navigator.onLine) {
@@ -559,8 +576,14 @@
                 splashScreen.style.opacity = '1';
                 iframe.style.display = 'block';
 
-                // Memaksa iframe GAS memuat ulang data murni dari Server Google
-                iframe.src = iframe.src;
+                // Memaksa iframe GAS memuat ulang data murni dari Server Google dengan cache-buster
+                try {
+                    const url = new URL(iframe.src);
+                    url.searchParams.set('t', Date.now());
+                    iframe.src = url.toString();
+                } catch (e) {
+                    iframe.src = iframe.src;
+                }
             } else {
                 // Efek getar kecil pada kartu offline jika ditekan saat masih offline
                 const card = document.querySelector('.glass-card');
@@ -581,6 +604,16 @@
                     .then((registration) => {
                         console.log('✓ Service Worker AuditPro berhasil terdaftar di domain Vercel dengan skope:', registration.scope);
 
+                        // Lakukan pengecekan update secara manual saat aplikasi dibuka
+                        registration.update();
+
+                        // Cek update setiap 5 menit (300.000 ms) jika aplikasi tetap terbuka
+                        setInterval(() => {
+                            if (navigator.onLine) {
+                                registration.update().catch(err => console.log('Gagal update SW:', err));
+                            }
+                        }, 300000);
+
                         // Listener untuk mendeteksi update berkas sw.js baru
                         registration.addEventListener('updatefound', () => {
                             const newWorker = registration.installing;
@@ -595,6 +628,16 @@
                     .catch((error) => {
                         console.error('... Registrasi Service Worker gagal:', error);
                     });
+
+                // Deteksi pergantian controller (service worker baru mengambil alih)
+                let refreshing = false;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (!refreshing) {
+                        refreshing = true;
+                        // Paksa reload browser dengan cache bypass
+                        window.location.reload();
+                    }
+                });
             });
         }
     </script>
